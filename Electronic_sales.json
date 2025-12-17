@@ -1,0 +1,416 @@
+{
+  "name": "Electronic_sales",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1uP9qZZd9izEhpZR-8ZiDSiG1Su-7zWoN2upI2CKjyV4",
+          "mode": "list",
+          "cachedResultName": "Electronic_sales_Sep2023-Sep2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uP9qZZd9izEhpZR-8ZiDSiG1Su-7zWoN2upI2CKjyV4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1377796692,
+          "mode": "list",
+          "cachedResultName": "Sales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uP9qZZd9izEhpZR-8ZiDSiG1Su-7zWoN2upI2CKjyV4/edit#gid=1377796692"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -48
+      ],
+      "id": "d0020612-f49d-4c15-8280-84a91de1fa4b",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "bSiCKGEtGTtdPEGS",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional data analyst.\n\nYou will be given a set of KPIs derived from a sales dataset.\nYour task is to generate a clear, concise business summary based on the KPIs provided.\n\nInstructions:\n- Write the summary in simple, professional business language\n- Highlight key trends, patterns, and insights\n- Do NOT explain how the KPIs were calculated\n- Do NOT repeat KPI names verbatim unless necessary\n- Keep the summary short (4–6 sentences)\n- Focus on revenue performance, customer behavior, and product insights\n\nKPIs:{{ $json.productTypeByTotalPrice }}\n{{ $json.totalSalesByPurchaseDate }}\n{{ $json.paymentMethodByTotalPrice }}{{ $json.orderStatusDistribution }}{{ $json.customerAgeGroupByTotalPrice }}\nGenerate a business summary based only on the KPIs above.\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -112,
+        -192
+      ],
+      "id": "f7ce1d5c-1cad-4be3-b405-a201c9cc1dd5",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -176
+      ],
+      "id": "5d1439d3-09ec-4819-bb67-8370b76f3451",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Kf9iYsYOQoARGRqr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        -96
+      ],
+      "id": "e0e548ab-a94c-4093-bffe-08a8f5e474e6",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chart\": {\n    \"type\": \"bar\",\n    \"data\": {\n      \"labels\": [\"Smartphone\", \"Tablet\", \"Laptop\", \"Smartwatch\", \"Headphones\"],\n      \"datasets\": [\n        {\n          \"label\": \"Total Price\",\n          \"data\": [21516754.69, 11712000.41, 12296239.97, 14036273.06, 4041400.24]\n        }\n      ]\n    },\n    \"options\": {\n      \"title\": {\n        \"display\": true,\n        \"text\": \"Product Type by Total Price\"\n      }\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -656,
+        192
+      ],
+      "id": "c0451370-042c-4cc9-8b69-9bb70ca3f1e7",
+      "name": "productTypeByTotalPrice"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chart\": {\n    \"type\": \"line\",\n    \"data\": {\n      \"labels\": [\n        \"45193\",\n        \"45194\",\n        \"45195\",\n        \"45196\",\n        \"45197\",\n        \"45198\",\n        \"45199\",\n        \"45200\",\n        \"45201\",\n        \"45202\"\n      ],\n      \"datasets\": [\n        {\n          \"label\": \"Total Sales\",\n          \"data\": [\n            60367.44,\n            63424.03,\n            61274.83,\n            82292.89,\n            89889.52,\n            44312.91,\n            80400.17,\n            94962.43,\n            62296.35,\n            98632.79\n          ],\n          \"fill\": false,\n          \"borderWidth\": 2\n        }\n      ]\n    },\n    \"options\": {\n      \"title\": {\n        \"display\": true,\n        \"text\": \"Total Sales by Purchase Date\"\n      },\n      \"scales\": {\n        \"xAxes\": [\n          {\n            \"scaleLabel\": {\n              \"display\": true,\n              \"labelString\": \"Purchase Date\"\n            }\n          }\n        ],\n        \"yAxes\": [\n          {\n            \"scaleLabel\": {\n              \"display\": true,\n              \"labelString\": \"Total Sales\"\n            },\n            \"ticks\": {\n              \"beginAtZero\": true\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "25f83e3c-4480-4574-9ae0-ed008f68707b",
+      "name": "totalSalesByPurchaseDate"
+    },
+    {
+      "parameters": {
+        "sendTo": "mohammedraiyaneajas@gmail.com",
+        "subject": "New Report",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        192
+      ],
+      "id": "1389fa37-7975-4910-a724-db405704780b",
+      "name": "Send a message",
+      "webhookId": "76f9ba4a-53c8-4fc9-8eec-d4bf270e28af",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BbxY7i1of2Qsq9rq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst cleanedData = items.map((item) => {\n  const cleanedItem = { ...item.json };\n\n  // Clean 'Customer ID'\n  cleanedItem[\"Customer ID\"] = cleanedItem[\"Customer ID\"]\n    ? cleanedItem[\"Customer ID\"].toString().trim()\n    : \"\";\n\n  // Clean 'Age'\n  cleanedItem[\"Age\"] = cleanedItem[\"Age\"]\n    ? parseInt(cleanedItem[\"Age\"], 10)\n    : 0;\n\n  // Clean 'Gender'\n  cleanedItem[\"Gender\"] = cleanedItem[\"Gender\"]\n    ? cleanedItem[\"Gender\"].toString().trim().toLowerCase()\n    : \"\";\n\n  // Clean 'Loyalty Member'\n  cleanedItem[\"Loyalty Member\"] = cleanedItem[\"Loyalty Member\"]\n    ? cleanedItem[\"Loyalty Member\"].toString().trim().toLowerCase()\n    : \"\";\n\n  // Clean 'Product Type'\n  cleanedItem[\"Product Type\"] = cleanedItem[\"Product Type\"]\n    ? cleanedItem[\"Product Type\"].toString().trim()\n    : \"\";\n\n  // Clean 'SKU'\n  cleanedItem[\"SKU\"] = cleanedItem[\"SKU\"]\n    ? cleanedItem[\"SKU\"].toString().trim()\n    : \"\";\n\n  // Clean 'Rating'\n  cleanedItem[\"Rating\"] = cleanedItem[\"Rating\"]\n    ? parseFloat(cleanedItem[\"Rating\"])\n    : 0;\n\n  // Clean 'Order Status'\n  cleanedItem[\"Order Status\"] = cleanedItem[\"Order Status\"]\n    ? cleanedItem[\"Order Status\"].toString().trim().toLowerCase()\n    : \"\";\n\n  // Clean 'Payment Method'\n  cleanedItem[\"Payment Method\"] = cleanedItem[\"Payment Method\"]\n    ? cleanedItem[\"Payment Method\"].toString().trim().toLowerCase()\n    : \"\";\n\n  // Clean 'Total Price'\n  cleanedItem[\"Total Price\"] = cleanedItem[\"Total Price\"]\n    ? parseFloat(cleanedItem[\"Total Price\"])\n    : 0;\n\n  // Clean 'Unit Price'\n  cleanedItem[\"Unit Price\"] = cleanedItem[\"Unit Price\"]\n    ? parseFloat(cleanedItem[\"Unit Price\"])\n    : 0;\n\n  // Clean 'Quantity'\n  cleanedItem[\"Quantity\"] = cleanedItem[\"Quantity\"]\n    ? parseInt(cleanedItem[\"Quantity\"], 10)\n    : 0;\n\n  // Clean 'Purchase Date'\n  cleanedItem[\"Purchase Date\"] = cleanedItem[\"Purchase Date\"]\n    ? parseInt(cleanedItem[\"Purchase Date\"], 10)\n    : 0;\n\n  // Clean 'Shipping Type'\n  cleanedItem[\"Shipping Type\"] = cleanedItem[\"Shipping Type\"]\n    ? cleanedItem[\"Shipping Type\"].toString().trim().toLowerCase()\n    : \"\";\n\n  // Clean 'Add-ons Purchased'\n  cleanedItem[\"Add-ons Purchased\"] = cleanedItem[\"Add-ons Purchased\"]\n    ? cleanedItem[\"Add-ons Purchased\"].toString().trim()\n    : \"\";\n\n  // Clean 'Add-on Total'\n  cleanedItem[\"Add-on Total\"] = cleanedItem[\"Add-on Total\"]\n    ? parseFloat(cleanedItem[\"Add-on Total\"])\n    : 0;\n\n  return { json: cleanedItem };\n});\n\nreturn cleanedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -48
+      ],
+      "id": "277cb7a3-20a4-475e-845e-3c8c00a5c75b",
+      "name": "Data Cleaning"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\n\n// KPI 1: Product Type by Total Price\nconst productTypeByTotalPrice = items.reduce((acc, item) => {\n  acc[item[\"Product Type\"]] =\n    (acc[item[\"Product Type\"]] || 0) + item[\"Total Price\"];\n  return acc;\n}, {});\n\n// KPI 2: Total Sales by Purchase Date\nconst totalSalesByPurchaseDate = items.reduce((acc, item) => {\n  acc[item[\"Purchase Date\"]] =\n    (acc[item[\"Purchase Date\"]] || 0) + item[\"Total Price\"];\n  return acc;\n}, {});\n\n// KPI 3: Payment Method by Total Price\nconst paymentMethodByTotalPrice = items.reduce((acc, item) => {\n  acc[item[\"Payment Method\"]] =\n    (acc[item[\"Payment Method\"]] || 0) + item[\"Total Price\"];\n  return acc;\n}, {});\n\n// KPI 4: Order Status Distribution\nconst orderStatusDistribution = items.reduce((acc, item) => {\n  acc[item[\"Order Status\"]] = (acc[item[\"Order Status\"]] || 0) + 1;\n  return acc;\n}, {});\n\n// KPI 5: Customer Age Group by Total Price\nconst customerAgeGroupByTotalPrice = items.reduce((acc, item) => {\n  const ageGroup =\n    item.Age < 20\n      ? \"Below 20\"\n      : item.Age < 30\n        ? \"20-29\"\n        : item.Age < 40\n          ? \"30-39\"\n          : \"40+\";\n  acc[ageGroup] = (acc[ageGroup] || 0) + item[\"Total Price\"];\n  return acc;\n}, {});\n\nreturn [\n  {\n    json: {\n      productTypeByTotalPrice,\n      totalSalesByPurchaseDate,\n      paymentMethodByTotalPrice,\n      orderStatusDistribution,\n      customerAgeGroupByTotalPrice,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "90077665-0302-439d-be4f-a1281b5b9dd5",
+      "name": "KPI Generation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1️⃣ Extract LLM summary text\nconst summaryItem = items.find(item => item.json.text);\nconst summaryText =\n  summaryItem?.json.text ||\n  summaryItem?.json.output ||\n  summaryItem?.json.response ||\n  \"Summary not available\";\n\n// 2️⃣ Extract chart URLs (bar, line, etc.)\nconst chartUrls = items\n  .filter(item => item.json.url)\n  .map(item => item.json.url);\n\n// 3️⃣ Build HTML for charts\nconst chartsHtml = chartUrls.map((url, index) => `\n  <div style=\"margin: 30px 0; text-align: center;\">\n    <h3>Chart ${index + 1}</h3>\n    <img src=\"${url}\" alt=\"Chart ${index + 1}\" style=\"max-width: 100%; border-radius: 6px;\" />\n  </div>\n`).join(\"\");\n\n// 4️⃣ Google Sheet details\nconst googleSheetUrl = \"https://docs.google.com/spreadsheets/d/1uP9qZZd9izEhpZR-8ZiDSiG1Su-7zWoN2upI2CKjyV4/edit?usp=sharing\";\nconst googleSheetName = \"Electronic Sales Data (Sep 2023 – Sep 2024)\";\n\n// 5️⃣ Generate final HTML\nconst html = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>Sales KPI Summary</title>\n  <style>\n    body {\n      font-family: Arial, Helvetica, sans-serif;\n      background-color: #f4f6f8;\n      margin: 0;\n      padding: 40px;\n    }\n    .container {\n      max-width: 900px;\n      margin: auto;\n      background: #ffffff;\n      padding: 30px;\n      border-radius: 8px;\n      box-shadow: 0 4px 10px rgba(0,0,0,0.08);\n    }\n    h1 {\n      color: #2c3e50;\n      margin-bottom: 10px;\n    }\n    h2 {\n      color: #2c3e50;\n      margin-top: 40px;\n    }\n    h3 {\n      color: #34495e;\n    }\n    .subtitle {\n      color: #7f8c8d;\n      margin-bottom: 30px;\n    }\n    .summary {\n      font-size: 16px;\n      line-height: 1.7;\n      color: #333;\n      white-space: pre-line;\n      margin-bottom: 40px;\n    }\n    .section {\n      margin-top: 30px;\n      font-size: 15px;\n      line-height: 1.6;\n      color: #333;\n    }\n    .footer {\n      margin-top: 40px;\n      font-size: 12px;\n      color: #999;\n      text-align: right;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h1>Sales Performance Summary</h1>\n    <div class=\"subtitle\">Automated KPI Insights</div>\n\n    <div class=\"summary\">\n      ${summaryText}\n    </div>\n\n    <h2>Visual Insights</h2>\n    ${chartsHtml}\n\n    <h2>Source Data</h2>\n    <div class=\"section\">\n      The analysis is based on the following Google Sheet dataset:<br/>\n      <strong>\n        <a href=\"${googleSheetUrl}\" target=\"_blank\">\n          ${googleSheetName}\n        </a>\n      </strong>\n    </div>\n\n    <h2>Analyst Details</h2>\n    <div class=\"section\">\n      <strong>Role:</strong> Data Analyst<br/>\n      <strong>Responsibilities:</strong>\n      <ul>\n        <li>Data cleaning and preprocessing</li>\n        <li>KPI identification and calculation</li>\n        <li>Sales trend and product performance analysis</li>\n        <li>Automated dashboard and report generation</li>\n        <li>LLM-based business insight generation</li>\n      </ul>\n      <strong>Tools Used:</strong> Google Sheets, n8n, JavaScript, QuickChart, LLM (Ollama Cloud)<br/>\n      <strong>Outcome:</strong> Delivered a fully automated, insight-driven sales performance report with charts and narrative summary.\n    </div>\n\n    <div class=\"footer\">\n      Generated automatically by n8n + LLM\n    </div>\n  </div>\n</body>\n</html>\n`;\n\n// 6️⃣ Return final HTML\nreturn [\n  {\n    json: {\n      html: html\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -32
+      ],
+      "id": "7816630c-cadc-41c5-96c3-57ec48b47c6c",
+      "name": "HTML Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chart\": {\n    \"type\": \"pie\",\n    \"data\": {\n      \"labels\": [\n        \"Credit Card\",\n        \"Debit Card\",\n        \"UPI\",\n        \"Cash\",\n        \"Net Banking\"\n      ],\n      \"datasets\": [\n        {\n          \"label\": \"Total Price\",\n          \"data\": [\n            18543210.75,\n            12456390.50,\n            15239876.20,\n            6845230.40,\n            9234567.30\n          ]\n        }\n      ]\n    },\n    \"options\": {\n      \"title\": {\n        \"display\": true,\n        \"text\": \"Payment Method by Total Price\"\n      }\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -304,
+        320
+      ],
+      "id": "41b69724-c382-4117-8ae2-b7b9fd5aa508",
+      "name": "paymentMethodByTotalPrice"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chart\": {\n    \"type\": \"doughnut\",\n    \"data\": {\n      \"labels\": [\n        \"Completed\",\n        \"Cancelled\"\n      ],\n      \"datasets\": [\n        {\n          \"label\": \"Order Count\",\n          \"data\": [\n            13432,\n            6568\n          ]\n        }\n      ]\n    },\n    \"options\": {\n      \"title\": {\n        \"display\": true,\n        \"text\": \"Order Status Distribution\"\n      },\n      \"cutoutPercentage\": 60\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        256
+      ],
+      "id": "0d95d261-d2be-49ef-be2b-81dd594bca11",
+      "name": "orderStatusDistribution"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart/create",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chart\": {\n    \"type\": \"bar\",\n    \"data\": {\n      \"labels\": [\n        \"Below 20\",\n        \"20–29\",\n        \"30–39\",\n        \"40+\"\n      ],\n      \"datasets\": [\n        {\n          \"label\": \"Total Price\",\n          \"data\": [\n            1973667.26,\n            9903956.31,\n            10241322.20,\n            41483722.60\n          ]\n        }\n      ]\n    },\n    \"options\": {\n      \"title\": {\n        \"display\": true,\n        \"text\": \"Customer Age Group by Total Price\"\n      },\n      \"scales\": {\n        \"yAxes\": [\n          {\n            \"ticks\": {\n              \"beginAtZero\": true\n            },\n            \"scaleLabel\": {\n              \"display\": true,\n              \"labelString\": \"Total Price\"\n            }\n          }\n        ],\n        \"xAxes\": [\n          {\n            \"scaleLabel\": {\n              \"display\": true,\n              \"labelString\": \"Age Group\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        192
+      ],
+      "id": "90e9ec7a-9062-4bb2-901a-d683ce83e716",
+      "name": "customerAgeGroupByTotalPrice"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Data Cleaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "productTypeByTotalPrice": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "totalSalesByPurchaseDate": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTML Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Cleaning": {
+      "main": [
+        [
+          {
+            "node": "KPI Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI Generation": {
+      "main": [
+        [
+          {
+            "node": "productTypeByTotalPrice",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "totalSalesByPurchaseDate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "paymentMethodByTotalPrice",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "orderStatusDistribution",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "customerAgeGroupByTotalPrice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Code": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "paymentMethodByTotalPrice": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "orderStatusDistribution": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "customerAgeGroupByTotalPrice": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3744bf33-649c-4e78-aba7-47ab5539b0a3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f411470bc68aeb1b7b836a5d93d52de4419b981e673d6f064609f41f749ed8c"
+  },
+  "id": "hvbWaa4XDQ66RaBZ",
+  "tags": []
+}
